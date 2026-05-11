@@ -68,7 +68,7 @@ It seems that the first column of the query is not a `STRING` data type. So I ne
 And because the backend is using `PostgreSQL 12.22`, I used the payload
 
 ```sql
-Lifestyle' UNION SELECT NULL, username ||'-->'|| password FROM users -- -
+Lifestyle' UNION SELECT NULL, username ||'->'|| password FROM users -- -
 ```
 
 And luckily, the payload worked
