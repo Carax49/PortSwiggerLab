@@ -45,8 +45,30 @@ Ta có thể sử dụng null byte (`\0`) có URL encode là `%00` để bypass
 
 Một số ngôn ngữ hoặc thư viện cũ (đặc biệt C/C++) coi null byte là `kết thúc chuỗi`, tức hệ thống chỉ đọc đến kí tự đó là dừng
 
-Giả sử server chỉ cho phép đọc file có đuôi `.png`, ta có file `ahihi.txt%00.png`
+Giả sử server chỉ cho phép đọc file có đuôi `.png`, và ta có payload `ahihi.txt%00.png`
 
--> 
+-> Server check `.png` --> OK --> Bypass validation
+
+-> Hệ thống đọc `ahihi.txt`, gặp `\0` --> Kết thúc đọc
 
 ---
+
+Ta có thể lợi dụng điều trên để bypass việc check đuôi file của hệ thống mà vẫn đọc được `/etc/passwd`
+
+Từ những traffic hợp lệ mà ta bắt ban đầu, ta có thể biết được server chấp nhận đuôi file nào 
+
+![](<Images/validation of file extension with null byte bypass 3.png>)
+
+Dễ thấy, server chấp nhận đuôi `.jpg`
+
+Ta có payload
+
+```text
+../../../../../etc/passwd%00.jpg
+```
+
+![](<Images/validation of file extension with null byte bypass 4.png>)
+
+Và tôi đã đọc được nội dung trong `/etc/passwd`
+
+Lab đã được giải
