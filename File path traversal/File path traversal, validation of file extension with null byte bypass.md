@@ -10,11 +10,11 @@
 
 ## Solution
 
-Truy cập vào trang web và dùng Burp để bắt traffic có dạng về các bức ảnh trên web
+Access the website and use Burp Suite to intercept traffic related to the images displayed on the website.
 
 ![](<Images/validation of file extension with null byte bypass 1.png>)
 
-Thử sử dụng payload đường dẫn tuyệt đối
+I first tried using an absolute path payload:
 
 ```text
 /etc/passwd
@@ -22,46 +22,50 @@ Thử sử dụng payload đường dẫn tuyệt đối
 
 ![](<Images/validation of file extension with null byte bypass 2.png>)
 
-Tôi cũng đã thử với đường dẫn tương đối
+I also tried using a relative path:
 
 ```text
 ../../../../../../etc/passwd
 ```
 
-Nhưng kết quả trả cũng tương tự
+But the result was still:
 
 ```text
 No such file
 ```
 
-Theo mô tả của lab, ta sẽ cần sử dụng `null byte` và file extension
+According to the lab description, we need to use a `null byte` and file extension validation bypass.
 
-Ý tưởng
-
----
-Một số trang web sẽ chỉ cho phép truy cập vào 1 số file có phần mở rổng nhất định như `.txt`, `.png`, ...
-
-Ta có thể sử dụng null byte (`\0`) có URL encode là `%00` để bypass
-
-Một số ngôn ngữ hoặc thư viện cũ (đặc biệt C/C++) coi null byte là `kết thúc chuỗi`, tức hệ thống chỉ đọc đến kí tự đó là dừng
-
-Giả sử server chỉ cho phép đọc file có đuôi `.png`, và ta có payload `ahihi.txt%00.png`
-
--> Server check `.png` --> OK --> Bypass validation
-
--> Hệ thống đọc `ahihi.txt`, gặp `\0` --> Kết thúc đọc
+Idea
 
 ---
 
-Ta có thể lợi dụng điều trên để bypass việc check đuôi file của hệ thống mà vẫn đọc được `/etc/passwd`
+Some web applications only allow access to files with specific extensions such as `.txt`, `.png`, and so on.
 
-Từ những traffic hợp lệ mà ta bắt ban đầu, ta có thể biết được server chấp nhận đuôi file nào 
+We can use a null byte (`\0`), whose URL-encoded form is `%00`, to bypass this validation.
+
+Some old programming languages or libraries (especially C/C++) treat a null byte as the `end of a string`, meaning the system stops reading the string once it reaches that character.
+
+For example, suppose the server only allows files with the `.png` extension, and we use the payload:
+
+```text
+ahihi.txt%00.png
+```
+
+- The server checks for `.png` --> OK --> Validation bypassed
+- The system reads `ahihi.txt`, encounters `\0` --> Stops reading
+
+---
+
+We can abuse this behavior to bypass the file extension validation while still reading `/etc/passwd`.
+
+From the valid traffic we intercepted earlier, we can determine which file extension the server accepts.
 
 ![](<Images/validation of file extension with null byte bypass 3.png>)
 
-Dễ thấy, server chấp nhận đuôi `.jpg`
+As we can see, the server accepts the `.jpg` extension.
 
-Ta có payload
+So I used the following payload:
 
 ```text
 ../../../../../etc/passwd%00.jpg
@@ -69,6 +73,6 @@ Ta có payload
 
 ![](<Images/validation of file extension with null byte bypass 4.png>)
 
-Và tôi đã đọc được nội dung trong `/etc/passwd`
+And I was able to read the contents of `/etc/passwd`.
 
-Lab đã được giải
+The lab was solved.
