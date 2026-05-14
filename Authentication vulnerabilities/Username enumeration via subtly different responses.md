@@ -22,7 +22,7 @@ Invalid username or password.
 
 Use BurpSuite to capture that traffic and send it to the `Intruder` tab to perform the attack.
 
-I will attack the username first with the password list provided by the lab in the description.
+I will attack the username first with the username list provided by the lab in the description.
 
 Attack type: `Sniper attack`
 
